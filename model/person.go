@@ -1,6 +1,9 @@
 package model
 
-import "fmt"
+import (
+	"fmt"
+	"log"
+)
 
 type Person struct {
 	firstName string
@@ -22,6 +25,6 @@ func (p *Person) GetFullName() string {
 	return fmt.Sprintf("%s %s", p.firstName, p.lastName)
 }
 
-func (p *Person) Greetings() {
-	fmt.Printf("Hello. %s\n", p.GetFullName())
+func (p *Person) Greetings(logger log.Logger) {
+	logger.Printf("Hello. %s\n", p.GetFullName())
 }
