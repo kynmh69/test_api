@@ -1,18 +1,24 @@
 package main
 
 import (
+	"context"
 	"encoding/json"
 	"log"
 	"math/rand"
 	"net/http"
 	"strconv"
 	"test_api/model"
+	"time"
 
 	"github.com/gorilla/mux"
+	"go.mongodb.org/mongo-driver/mongo"
+	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
 // Bookのデータを保持するスライスの作成
 var books []model.Book
+
+const CantConnectDbMsg = "Can't connect DB.\n"
 
 // Get All Books
 func getBooks(w http.ResponseWriter, r *http.Request) {
@@ -82,6 +88,20 @@ func deleteBook(w http.ResponseWriter, r *http.Request) {
 }
 
 func main() {
+
+	client, err := mongo.NewClient(options.Client().ApplyURI("localhost:8083"))
+	if err != nil {
+		log.Fatalf(CantConnectDbMsg)
+	}
+	ctx, cancel := context.WithTimeout(context.Background(), 20*time.Second)
+	defer cancel()
+	err = client.Connect(ctx)
+	if err != nil {
+		log.Fatalf(CantConnectDbMsg)
+	}
+
+	client.Disconnect(ctx)
+
 	// ルーターのイニシャライズ
 	r := mux.NewRouter()
 
