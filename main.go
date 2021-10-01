@@ -23,7 +23,10 @@ const CantConnectDbMsg = "Can't connect DB.\n"
 // Get All Books
 func getBooks(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(books)
+	err := json.NewEncoder(w).Encode(books)
+	if err != nil {
+		return
+	}
 }
 
 // Get Single Book
@@ -34,11 +37,17 @@ func getBook(w http.ResponseWriter, r *http.Request) {
 	// Loop through books and find with id
 	for _, item := range books {
 		if item.ID == params["id"] {
-			json.NewEncoder(w).Encode(item)
+			err := json.NewEncoder(w).Encode(item)
+			if err != nil {
+				return
+			}
 			return
 		}
 	}
-	json.NewEncoder(w).Encode(&model.Book{})
+	err := json.NewEncoder(w).Encode(&model.Book{})
+	if err != nil {
+		return
+	}
 }
 
 // Create a Book
@@ -49,7 +58,10 @@ func createBook(w http.ResponseWriter, r *http.Request) {
 	_ = json.NewDecoder(r.Body).Decode(&book)
 	book.ID = strconv.Itoa(rand.Intn(10000)) // Mock ID - not safe in production
 	books = append(books, book)
-	json.NewEncoder(w).Encode(book)
+	err := json.NewEncoder(w).Encode(book)
+	if err != nil {
+		return
+	}
 }
 
 // Update a Book
@@ -65,11 +77,17 @@ func updateBook(w http.ResponseWriter, r *http.Request) {
 			_ = json.NewDecoder(r.Body).Decode(&book)
 			book.ID = params["id"]
 			books = append(books, book)
-			json.NewEncoder(w).Encode(book)
+			err := json.NewEncoder(w).Encode(book)
+			if err != nil {
+				return
+			}
 			return
 		}
 	}
-	json.NewEncoder(w).Encode(books)
+	err := json.NewEncoder(w).Encode(books)
+	if err != nil {
+		return
+	}
 }
 
 // Delete a Book
@@ -84,7 +102,10 @@ func deleteBook(w http.ResponseWriter, r *http.Request) {
 			break
 		}
 	}
-	json.NewEncoder(w).Encode(books)
+	err := json.NewEncoder(w).Encode(books)
+	if err != nil {
+		return
+	}
 }
 
 func main() {
@@ -100,7 +121,10 @@ func main() {
 		log.Fatalf(CantConnectDbMsg)
 	}
 
-	client.Disconnect(ctx)
+	err = client.Disconnect(ctx)
+	if err != nil {
+		return
+	}
 
 	// ルーターのイニシャライズ
 	r := mux.NewRouter()
